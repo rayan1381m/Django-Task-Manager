@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Task List{% endblock %}
+
+{% block content %}
+    <h1 class="mt-5">Task List</h1>
+
+    <!-- Search form -->
+    <form method="GET" class="mt-3">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="search" placeholder="Search tasks" value="{{ form_search.search.value }}">
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+    </form>
+
+    <!-- Add Task button -->
+    <button id="addTaskButton" class="btn btn-primary mb-3">Add Task</button>
+
+    <!-- Task form -->
+    <div id="taskFormContainer" style="display: none;">
+        <h2>Add Task</h2>
+        <form method="post" action="{% url 'tasks:list_create' %}">
+            {% csrf_token %}
+            {{ form_task.as_p }}
+            <button type="submit" class="btn btn-primary">Create Task</button>
+        </form>
+    </div>
+
+    <!-- Task list -->
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.status }}</td>
+                <td>
+                    <a href="{% url 'tasks:detail' pk=task.pk %}" class="btn btn-info btn-sm">Detail</a>
+                    <a href="{% url 'tasks:edit' pk=task.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'tasks:delete' pk=task.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- API Access Buttons -->
+    <h2 class="mt-5">API Access</h2>
+    <a href="/apis/tasks/" class="btn btn-outline-info">View Task API</a>
+    <a href="/apis/tasks/{{ task.pk }}" class="btn btn-outline-info">View Task Detail API</a>
+
+    <script>
+        function toggleTaskForm() {
+            var taskFormContainer = document.getElementById('taskFormContainer');
+            taskFormContainer.style.display = taskFormContainer.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.getElementById('addTaskButton').addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleTaskForm();
+        });
+    </script>
+{% endblock %}
